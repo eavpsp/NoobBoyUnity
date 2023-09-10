@@ -152,7 +152,7 @@ public class Instructions
         if (condition)
         {
             sbyte offset = (sbyte)mmu.read_byte(registers.pc); // Read the signed byte value
-            registers.pc = (ushort)(registers.pc + 1 + offset); // Increment PC by the signed offset
+            registers.pc += (ushort)(1 + offset); // Increment PC by the signed offset
             mmu._clock.t_instr += 12;
  
         }
@@ -2535,7 +2535,7 @@ public class Instructions
                     registers.pc += 2;
                     break;
                 case 0xEE: // XOR n
-                    xor_(mmu.read_byte((ushort)(registers.pc + 1)));
+                    xor_(mmu.read_byte((ushort)(registers.pc++)));
                     break;
                 case 0xEF: // RST $28
                     mmu.write_short_stack(ref registers.sp, registers.pc++);
