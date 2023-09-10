@@ -94,6 +94,7 @@ public class GBRenderer
     {
         for (int i = 0; i < 144 * 160; i++)
         {
+            newColor[i] = new Color32();
             Color color = ppu.framebuffer[i];
             newColor[i].r = color.r;
             newColor[i].g = color.g;
