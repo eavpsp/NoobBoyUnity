@@ -447,16 +447,11 @@ public class PPU
                 if (pixel >= 160) break;
                
                 byte colour = mmu.tiles[tile].pixels[y][x];
-                if (this.scanline < 144)
-                {
-                    framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
-                    if (colour > 0)
-                        row_pixels[pixel] = true;
-                    pixel++;
-                }
-                
-                
-                
+                framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
+                if (colour > 0)
+                    row_pixels[pixel] = true;
+                pixel++;
+
             }
             x = 0;
         }
@@ -496,11 +491,9 @@ public class PPU
 
             for (; x < 8; x++)
             {
-                if (pixelOffset++ < framebuffer.Length)
-                {
-                    int colour = mmu.tiles[tile].pixels[y][x];
-                    framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
-                }
+                if (pixelOffset > framebuffer.Length) continue;
+                int colour = mmu.tiles[tile].pixels[y][x];
+                framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
             }
             x = 0;
         }
@@ -509,7 +502,7 @@ public class PPU
 
     void render_scan_line_sprites(ref bool[] row_pixels)
     {
-        
+
 
         int sprite_height = control.spriteSize != 0 ? 16 : 8;
 
@@ -540,28 +533,28 @@ public class PPU
             if (!visible_sprites[i])
                 continue;
 
-       
+            MMU.Sprite sprite = mmu._sprites[i];
 
-            if ((mmu._sprites[i].x < -7) || (mmu._sprites[i].x >= 160))
+            if ((sprite.x < -7) || (sprite.x >= 160))
                 continue;
 
             // Flip vertically
-         
-            int pixel_y = mmu._sprites[i].yFlip != 0 ? (7 + 8 * control.spriteSize) - scanline - mmu._sprites[i].y : scanline - mmu._sprites[i].y;
+            int pixel_y = scanline - sprite.y;
+            pixel_y = sprite.yFlip != 0 ? (7 + 8 * control.spriteSize) - pixel_y : pixel_y;
 
             for (int x = 0; x < 8; x++)
             {
-                int tile_num = mmu._sprites[i].tile & (control.spriteSize != 0 ? 0xFE : 0xFF);
+                int tile_num = sprite.tile & (control.spriteSize != 0 ? 0xFE : 0xFF);
                 int colour = 0;
 
-                int x_temp = mmu._sprites[i].x + x;
+                int x_temp = sprite.x + x;
                 if (x_temp < 0 || x_temp >= 160)
                     continue;
 
                 int pixelOffset = this.scanline * 160 + x_temp;
 
                 // Flip horizontally
-                byte pixel_x = (byte)(mmu._sprites[i].xFlip != 0 ? 7 - x : x);
+                byte pixel_x = sprite.xFlip != 0 ? (byte)(7 - x ): (byte)x;
 
                 if (control.spriteSize != 0 && (pixel_y >= 8))
                     colour = mmu.tiles[tile_num + 1].pixels[pixel_y - 8][pixel_x];
@@ -572,9 +565,8 @@ public class PPU
                 if (colour == 0)
                     continue;
 
-                if (row_pixels[x_temp]|| mmu._sprites[i].renderPriority == 0)
-                    framebuffer[pixelOffset] = mmu._sprites[i].colourPalette[colour];
-                
+                if (!row_pixels[x_temp] || sprite.renderPriority == 0)
+                    framebuffer[pixelOffset] = sprite.colourPalette[colour];
             }
         }
     }

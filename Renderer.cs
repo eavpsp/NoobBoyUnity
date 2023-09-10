@@ -21,6 +21,9 @@ public class Renderer
     public int viewportHeight = 144;
     public byte[] viewportPixels = new byte[160 * 144 * 4];
     public Rect viewportRect;// = new Rect(0, 0, viewportWidth, viewportHeight);
+    Color32[] newColor;
+    SpriteRenderer spriteRender;
+
 
     public int windowHeight;
     public int windowWidth;
@@ -57,7 +60,9 @@ public class Renderer
         viewportTexture.Apply();
         Sprite material = unityGameObject.GetComponent<SpriteRenderer>().sprite; // Get the Material component
         material = Sprite.Create(viewportTexture, new Rect(0, 0, viewportTexture.width, viewportTexture.height), new Vector2(0.5f, 0.5f));
-    
+        newColor = new Color32[ppu.framebuffer.Length];
+        spriteRender = unityGameObject.GetComponent<SpriteRenderer>();
+
     }
 
     public void initWindow(int width, int height)
@@ -75,8 +80,10 @@ public class Renderer
         {
             float sleepTime = (framerate_time - timeTook) / 1000; // Convert back to seconds
             Time.timeScale = 0; // Pause the game
+            Debug.Log("Sleep");
             System.Threading.Thread.Sleep((int)(sleepTime * 1000)); // Sleep in milliseconds
             Time.timeScale = 1; // Resume the game
+            Debug.Log("Awake");
         }
 
         // Record the start time of the next frame
@@ -85,7 +92,6 @@ public class Renderer
 
     void draw_viewport()
     {
-        Color32[] newColor = new Color32[ppu.framebuffer.Length]; 
         for (int i = 0; i < 144 * 160; i++)
         {
             Color color = ppu.framebuffer[i];
@@ -102,7 +108,7 @@ public class Renderer
         viewportTexture.SetPixels32(newColor);
         //viewportTexture.SetPixelData<byte>(viewportPixels, 0);
         viewportTexture.Apply();
-        unityGameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(viewportTexture, new Rect(0, 0, viewportTexture.width, viewportTexture.height), new Vector2(0.5f, 0.5f));// Get the Material component
+        spriteRender.sprite = Sprite.Create(viewportTexture, new Rect(0, 0, viewportTexture.width, viewportTexture.height), new Vector2(0.5f, 0.5f));// Get the Material component
 
     }
     public void Render()
