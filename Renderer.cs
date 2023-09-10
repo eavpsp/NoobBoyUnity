@@ -21,7 +21,7 @@ public class GBRenderer
     public int viewportHeight = 144;
     public byte[] viewportPixels = new byte[160 * 144 * 4];
     public Rect viewportRect;// = new Rect(0, 0, viewportWidth, viewportHeight);
-    Color32[] newColor;
+    Color32[] newColor = new Color32[144 * 160];
     SpriteRenderer spriteRender;
 
 
@@ -60,7 +60,6 @@ public class GBRenderer
         viewportTexture.Apply();
         Sprite material = unityGameObject.GetComponent<SpriteRenderer>().sprite; // Get the Material component
         material = Sprite.Create(viewportTexture, new Rect(0, 0, viewportTexture.width, viewportTexture.height), new Vector2(0.5f, 0.5f));
-        newColor = new Color32[ppu.framebuffer.Length];
         spriteRender = unityGameObject.GetComponent<SpriteRenderer>();
 
     }
@@ -94,7 +93,6 @@ public class GBRenderer
     {
         for (int i = 0; i < 144 * 160; i++)
         {
-            newColor[i] = new Color32();
             Color color = ppu.framebuffer[i];
             newColor[i].r = color.r;
             newColor[i].g = color.g;
