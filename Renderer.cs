@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Renderer 
+public class GBRenderer 
 {
     public GameObject unityGameObject;
     public Camera unityCamera;
@@ -34,7 +34,7 @@ public class Renderer
     public int startFrame;
     public int endFrame;
     private float startFrameTime;
-    public Renderer(Status._Status status, CPU cpu, PPU gpu, Registers registers, Interrupt interrupts, MMU mmu)
+    public GBRenderer(Status._Status status, CPU cpu, PPU gpu, Registers registers, Interrupt interrupts, MMU mmu)
     {
         this.cpu = cpu;
         this.ppu = gpu;

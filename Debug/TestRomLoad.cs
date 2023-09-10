@@ -16,7 +16,7 @@ public class TestRomLoad : MonoBehaviour
     public PPU ppu;
     Timer timer;
     Joypad joypad;
-    Renderer gbRender;
+    GBRenderer gbRender;
     public string romName;
     public string bootRomName;
     public bool debug;
@@ -62,7 +62,7 @@ public class TestRomLoad : MonoBehaviour
         cpu.instructions.debugLabel = debugTextOpCode;
         ppu = new PPU(registers, interrupts, mmu);
         joypad = new Joypad(status, interrupts, mmu);
-        gbRender = new Renderer(status, cpu, ppu, registers, interrupts, mmu);
+        gbRender = new GBRenderer(status, cpu, ppu, registers, interrupts, mmu);
         viewportTexture = new Texture2D(64, 40, TextureFormat.ARGB32, false);
 
 
