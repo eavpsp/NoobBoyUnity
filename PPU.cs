@@ -30,63 +30,64 @@ public class PPU
     {
 
 
-        public byte value;
+        public byte _value;
+        private byte _bgDisplay, _spriteDisplayEnable, _srpiteSize, _bgDisplaySelect, _bgWindowDataSelect, _windowEnable, _bgWindowDisplaySelect, _lcdEnable;
         public byte bgDisplay
         {
-            get { return (byte)(value & 0x01); }
-            set { UpdateValue();  }
+            get { return (byte)(_value & 0x01); }
+            set {  _bgDisplay = value; UpdateValue(); }
         }
 
         public byte spriteDisplayEnable
         {
-            get { return (byte)(value & 0x02); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x02); }
+            set {  _spriteDisplayEnable = value; UpdateValue(); }
         }
 
         public byte spriteSize
         {
-            get { return (byte)(value & 0x04); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x04); }
+            set {  _srpiteSize = value; UpdateValue(); }
         }
 
         public byte bgDisplaySelect
         {
-            get { return (byte)(value & 0x08); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x08); }
+            set { _bgDisplaySelect = value; UpdateValue(); }
         }
 
         public byte bgWindowDataSelect
         {
-            get { return (byte)(value & 0x10); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x10); }
+            set {  _bgWindowDataSelect = value; UpdateValue(); }
         }
 
         public byte windowEnable
         {
-            get { return (byte)(value & 0x20); }
-            set { UpdateValue();  }
+            get { return (byte)(_value & 0x20); }
+            set {  _windowEnable = value; UpdateValue(); }
         }
 
         public byte windowDisplaySelect
         {
-            get { return (byte)(value & 0x40); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x40); }
+            set { _bgWindowDisplaySelect = value; UpdateValue(); }
         }
 
         public byte lcdEnable
         {
-            get { return (byte)(value & 0x80); }
-            set { UpdateValue(); }
+            get { return (byte)(_value & 0x80); }
+            set { _lcdEnable = value;  UpdateValue(); }
         }
 
 
         public void UpdateControlMemory(MMU mmu)
         {
-            mmu.memory[0xff41] = this.value;
+            mmu.memory[0xff41] = this._value;
         }
         public void UpdateValue()
         {
-            this.value = (byte)
+            this._value = (byte)
             (
                (bgDisplay << 0) |
                (spriteDisplayEnable << 1) |
@@ -108,7 +109,7 @@ public class PPU
             windowEnable = 1;
             windowDisplaySelect = 1;
             lcdEnable = 1;
-            value = (byte)
+            _value = (byte)
             (
                (bgDisplay << 0) |
                (spriteDisplayEnable << 1) |
@@ -128,17 +129,17 @@ public class PPU
 
     public class Stat
     {
-        public byte value;
-
+        public byte _value;
+        private byte _mode_flag, _coincidence_flag, _hblank, _vblank, _oam, _cinterrupt;
         public byte mode_flag
         {
             get
             {
-                return (byte)(value & 0x03);
+                return (byte)(_value & 0x03);
             }
             set
             {
-                UpdateValue();
+                _mode_flag = value;  UpdateValue();
             }
 
         }
@@ -146,11 +147,11 @@ public class PPU
         {
             get
             {
-                return (byte)(value & 0x04);
+                return (byte)(_value & 0x04);
             }
             set
             {
-                UpdateValue();
+                _coincidence_flag = value; UpdateValue();
             }
             
            
@@ -163,11 +164,11 @@ public class PPU
         {
             get
             {
-                return (byte)(value & 0x08);
+                return (byte)(_value & 0x08);
             }
             set
             {
-                UpdateValue();
+                _hblank = value; UpdateValue();
             }
 
         }
@@ -175,11 +176,11 @@ public class PPU
         {
             get
             {
-                return (byte)(value & 0x10);
+                return (byte)(_value & 0x10);
             }
             set
             {
-                UpdateValue();
+                _vblank = value; UpdateValue();
 
             }
 
@@ -188,11 +189,11 @@ public class PPU
         {
             get
             {
-                return (byte)(value & 0x20);
+                return (byte)(_value & 0x20);
             }
             set
             {
-                UpdateValue();
+                _oam = value; UpdateValue();
             }
 
         }
@@ -200,17 +201,17 @@ public class PPU
         {
             get
             {
-                return (byte)(value & 0x40);
+                return (byte)(_value & 0x40);
             }
             set
             {
-                UpdateValue();
+                _cinterrupt = value;  UpdateValue();
             }
 
         }
         public void UpdateValue()
         {
-            value = (byte)
+            _value = (byte)
             (
                 (mode_flag & 0x03) |
                 (coincidence_flag & 0x04) |
@@ -228,7 +229,7 @@ public class PPU
             vblank_interrupt = 1;
             oam_interrupt = 1;
             coincidence_interrupt = 1;
-            value = (byte)
+            _value = (byte)
             (
                 (mode_flag & 0x03) |
                 (coincidence_flag & 0x04) |
@@ -240,12 +241,12 @@ public class PPU
         }
         public void UpdateStatMemory(MMU mmu)
         {
-            mmu.memory[0xff41] = this.value;
+            mmu.memory[0xff41] = this._value;
         }
         
     }
     public Stat stat;
-    public Color[] framebuffer = new Color[160 * 144];
+    public MColor[] framebuffer = new MColor[160 * 144];
 
 
     public byte[] background = new byte[32 * 32];
@@ -260,7 +261,7 @@ public class PPU
     {
         for (int i = 0; i < 160 * 144; i++)
         {
-            framebuffer[i] = new Color(0,0,0,255);
+            framebuffer[i] = new MColor(0,0,0,255);
         }
         for (int i = 0; i < 32 *32; i++)
         {
@@ -280,8 +281,8 @@ public class PPU
     {
         
         modeclock += mmu._clock.t_instr;
-        stat.value = mmu.memory[0xff41];
-        control.value = mmu.memory[0xFF40];
+        stat._value = mmu.memory[0xff41];
+        control._value = mmu.memory[0xFF40];
         
 
 
@@ -445,12 +446,15 @@ public class PPU
             for (; x < 8; x++)
             {
                 if (pixel >= 160) break;
-               
-                byte colour = mmu.tiles[tile].pixels[y][x];
-                framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
-                if (colour > 0)
-                    row_pixels[pixel] = true;
-                pixel++;
+                if (this.scanline < 144)
+                {
+                    int colour = mmu.tiles[tile].pixels[y, x];
+                    framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
+                    if (colour > 0)
+                        row_pixels[pixel] = true;
+                    pixel++;
+                }
+                
 
             }
             x = 0;
@@ -492,7 +496,7 @@ public class PPU
             for (; x < 8; x++)
             {
                 if (pixelOffset > framebuffer.Length) continue;
-                int colour = mmu.tiles[tile].pixels[y][x];
+                int colour = mmu.tiles[tile].pixels[y,x];
                 framebuffer[pixelOffset++] = mmu.palette_BGP[colour];
             }
             x = 0;
@@ -511,15 +515,15 @@ public class PPU
 
         for (int i = 39; i >= 0; i--)
         {
-            MMU.Sprite sprite = mmu._sprites[i];
+           
 
-            if (!sprite.ready)
+            if (!mmu._sprites[i].ready)
             {
                 visible_sprites[i] = false;
                 continue;
             }
 
-            if ((sprite.y > scanline) || ((sprite.y + sprite_height) <= scanline))
+            if ((mmu._sprites[i].y > scanline) || ((mmu._sprites[i].y + sprite_height) <= scanline))
             {
                 visible_sprites[i] = false;
                 continue;
@@ -539,34 +543,34 @@ public class PPU
                 continue;
 
             // Flip vertically
-            int pixel_y = scanline - sprite.y;
-            pixel_y = sprite.yFlip != 0 ? (7 + 8 * control.spriteSize) - pixel_y : pixel_y;
+            int pixel_y = scanline - mmu._sprites[i].y;
+            pixel_y = mmu._sprites[i].yFlip != 0 ? (7 + 8 * control.spriteSize) - pixel_y : pixel_y;
 
             for (int x = 0; x < 8; x++)
             {
-                int tile_num = sprite.tile & (control.spriteSize != 0 ? 0xFE : 0xFF);
+                int tile_num = mmu._sprites[i].tile & (control.spriteSize != 0 ? 0xFE : 0xFF);
                 int colour = 0;
 
-                int x_temp = sprite.x + x;
+                int x_temp = mmu._sprites[i].x + x;
                 if (x_temp < 0 || x_temp >= 160)
                     continue;
 
                 int pixelOffset = this.scanline * 160 + x_temp;
 
                 // Flip horizontally
-                byte pixel_x = sprite.xFlip != 0 ? (byte)(7 - x ): (byte)x;
+                byte pixel_x = mmu._sprites[i].xFlip != 0 ? (byte)(7 - x ): (byte)x;
 
                 if (control.spriteSize != 0 && (pixel_y >= 8))
-                    colour = mmu.tiles[tile_num + 1].pixels[pixel_y - 8][pixel_x];
+                    colour = mmu.tiles[tile_num + 1].pixels[pixel_y - 8,pixel_x];
                 else
-                    colour = mmu.tiles[tile_num].pixels[pixel_y][pixel_x];
+                    colour = mmu.tiles[tile_num].pixels[pixel_y,pixel_x];
 
                 // Black is transparent
                 if (colour == 0)
                     continue;
 
-                if (!row_pixels[x_temp] || sprite.renderPriority == 0)
-                    framebuffer[pixelOffset] = sprite.colourPalette[colour];
+                if (!row_pixels[x_temp] || mmu._sprites[i].renderPriority == 0)
+                    framebuffer[pixelOffset] = mmu._sprites[i].colourPalette[colour];
             }
         }
     }
